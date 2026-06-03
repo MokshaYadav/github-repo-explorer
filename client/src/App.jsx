@@ -1,19 +1,22 @@
-
 import { useState } from "react";
 import axios from "axios";
 import "./App.css";
 
 function App() {
+
   const [username, setUsername] = useState("");
   const [profile, setProfile] = useState(null);
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sortType, setSortType] = useState("stars");
 
   const searchUser = async () => {
-    if (!username) return;
+
+    if (!username.trim()) return;
 
     try {
+
       setLoading(true);
       setError("");
 
@@ -31,20 +34,60 @@ function App() {
     } catch (err) {
 
       setError(
-        err.response?.data?.message || "Something went wrong"
+        err.response?.data?.message ||
+        "Something went wrong"
       );
+
+      setProfile(null);
+      setRepos([]);
 
     } finally {
 
       setLoading(false);
 
     }
+
   };
 
+  const sortedRepos = [...repos].sort((a,b)=>{
+
+    if(sortType==="stars"){
+
+      return (
+        b.stargazers_count -
+        a.stargazers_count
+      );
+
+    }
+
+    if(sortType==="name"){
+
+      return a.name.localeCompare(
+        b.name
+      );
+
+    }
+
+    if(sortType==="updated"){
+
+      return (
+        new Date(b.updated_at) -
+        new Date(a.updated_at)
+      );
+
+    }
+
+    return 0;
+
+  });
+
   return (
+
     <div className="container">
 
-      <h1>GitHub Repo Explorer</h1>
+      <h1>
+        GitHub Repository Explorer
+      </h1>
 
       <div className="search-box">
 
@@ -52,7 +95,9 @@ function App() {
           type="text"
           placeholder="Enter GitHub Username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e)=>
+            setUsername(e.target.value)
+          }
         />
 
         <button onClick={searchUser}>
@@ -62,15 +107,19 @@ function App() {
       </div>
 
       {loading && (
+
         <p className="loading">
           Loading...
         </p>
+
       )}
 
       {error && (
+
         <p className="error">
           {error}
         </p>
+
       )}
 
       {profile && (
@@ -79,20 +128,89 @@ function App() {
 
           <img
             src={profile.avatar_url}
-            alt="avatar"
+            alt="profile"
           />
 
-          <h2>{profile.name}</h2>
+          <h2>
 
-          <p>@{profile.login}</p>
+            {profile.name ||
+             profile.login}
+
+          </h2>
 
           <p>
-            Followers: {profile.followers}
+
+            @{profile.login}
+
           </p>
 
           <p>
-            Public Repos: {profile.public_repos}
+
+            {
+              profile.bio ||
+              "No bio available"
+            }
+
           </p>
+
+          <p>
+
+            Followers:
+            {" "}
+            {profile.followers}
+
+          </p>
+
+          <p>
+
+            Following:
+            {" "}
+            {profile.following}
+
+          </p>
+
+          <p>
+
+            Public Repositories:
+            {" "}
+            {profile.public_repos}
+
+          </p>
+
+        </div>
+
+      )}
+
+      {repos.length > 0 && (
+
+        <div className="sort-box">
+
+          <label>
+            Sort Repositories
+          </label>
+
+          <select
+            value={sortType}
+            onChange={(e)=>
+              setSortType(
+                e.target.value
+              )
+            }
+          >
+
+            <option value="stars">
+              Sort by Stars
+            </option>
+
+            <option value="name">
+              Sort by Name
+            </option>
+
+            <option value="updated">
+              Sort by Updated
+            </option>
+
+          </select>
 
         </div>
 
@@ -100,7 +218,7 @@ function App() {
 
       <div className="repo-grid">
 
-        {repos.map((repo) => (
+        {sortedRepos.map((repo)=>(
 
           <div
             className="repo-card"
@@ -113,20 +231,55 @@ function App() {
               rel="noreferrer"
             >
 
-              <h3>{repo.name}</h3>
+              <h3>
+
+                {repo.name}
+
+              </h3>
 
             </a>
 
             <p>
-              {repo.description || "No description available"}
+
+              {
+                repo.description ||
+                "No description available"
+              }
+
             </p>
 
             <p>
+
               ⭐ {repo.stargazers_count}
+
             </p>
 
             <p>
-              {repo.language || "Unknown"}
+
+              Language:
+              {" "}
+              {
+                repo.language ||
+                "Unknown"
+              }
+
+            </p>
+
+            <p>
+
+              Updated:
+              {" "}
+
+              {
+
+              new Date(
+                repo.updated_at
+              )
+
+              .toLocaleDateString()
+
+              }
+
             </p>
 
           </div>
@@ -136,7 +289,9 @@ function App() {
       </div>
 
     </div>
+
   );
+
 }
 
 export default App;
