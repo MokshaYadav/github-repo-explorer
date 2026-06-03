@@ -3,6 +3,8 @@ import { useState } from "react";
 import axios from "axios";
 import "./App.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
 
   const [username, setUsername] = useState("");
@@ -79,14 +81,14 @@ function App() {
       const profileRes =
         await axios.get(
 
-`http://localhost:5000/api/github/${customUser}`
+`${API_URL}/api/github/${customUser}`
 
         );
 
       const repoRes =
         await axios.get(
 
-`http://localhost:5000/api/github/${customUser}/repos`
+`${API_URL}/api/github/${customUser}/repos`
 
         );
 
@@ -253,11 +255,17 @@ searchUser(user);
 
 {loading && (
 
-<p className="loading">
+<div className="loading-container">
 
-Loading...
+<div className="spinner"></div>
+
+<p>
+
+Fetching GitHub Data...
 
 </p>
+
+</div>
 
 )}
 
@@ -518,8 +526,6 @@ expandedRepo===repo.id && (
 
 Open Issues:
 
-{" "}
-
 {repo.open_issues_count}
 
 </p>
@@ -527,8 +533,6 @@ Open Issues:
 <p>
 
 Default Branch:
-
-{" "}
 
 {repo.default_branch}
 
@@ -538,8 +542,6 @@ Default Branch:
 
 Forks:
 
-{" "}
-
 {repo.forks_count}
 
 </p>
@@ -547,8 +549,6 @@ Forks:
 <p>
 
 Watchers:
-
-{" "}
 
 {repo.watchers_count}
 
