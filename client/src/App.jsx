@@ -89,11 +89,16 @@ function App() {
 
       <div className="search-box">
         <input
-          type="text"
-          placeholder="Enter GitHub Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+  type="text"
+  placeholder="Enter GitHub Username"
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      searchUser();
+    }
+  }}
+/>
 
         <button onClick={() => searchUser()}>Search</button>
       </div>

@@ -60,9 +60,8 @@ exports.getUserRepos = async (req, res) => {
     }
 
     const response = await axios.get(
-      `https://api.github.com/users/${username}/repos`
-    );
-
+  `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`
+);
     cache.set(
       `repos-${username}`,
 
