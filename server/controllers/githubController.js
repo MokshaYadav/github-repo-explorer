@@ -1,3 +1,4 @@
+
 const axios = require("axios");
 const NodeCache = require("node-cache");
 
@@ -9,81 +10,139 @@ exports.getUserProfile = async (req, res) => {
   try {
     const { username } = req.params;
 
-    const cachedUser = cache.get(`user-${username}`);
+    const cachedUser = cache.get(
+      `user-${username}`
+    );
 
     if (cachedUser) {
-      console.log("Serving profile from cache");
+      console.log(
+        "Serving profile from cache"
+      );
 
-      return res.json(cachedUser);
+      return res.json(
+        cachedUser
+      );
     }
 
     const response = await axios.get(
-      `https://api.github.com/users/${username}`
+      `https://api.github.com/users/${username}`,
+      {
+        headers: {
+          Authorization:
+            `token ${process.env.GITHUB_TOKEN}`,
+        },
+      }
     );
 
     cache.set(
       `user-${username}`,
-
       response.data
     );
 
     res.json(response.data);
+
   } catch (error) {
-    if (error.response?.status === 404) {
+
+    if (
+      error.response?.status === 404
+    ) {
+
       return res.status(404).json({
-        message: "User not found",
+        message:
+          "User not found",
       });
+
     }
 
-    if (error.response?.status === 403) {
+    if (
+      error.response?.status === 403 ||
+      error.response?.status === 429
+    ) {
+
       return res.status(403).json({
-        message: "GitHub rate limit exceeded. Try again later.",
+        message:
+          "GitHub rate limit exceeded. Try again later.",
       });
+
     }
 
     res.status(500).json({
-      message: "Server Error",
+      message:
+        "Server Error",
     });
+
   }
 };
 
 exports.getUserRepos = async (req, res) => {
   try {
+
     const { username } = req.params;
 
-    const cachedRepos = cache.get(`repos-${username}`);
+    const cachedRepos = cache.get(
+      `repos-${username}`
+    );
 
     if (cachedRepos) {
-      console.log("Serving repos from cache");
 
-      return res.json(cachedRepos);
+      console.log(
+        "Serving repos from cache"
+      );
+
+      return res.json(
+        cachedRepos
+      );
+
     }
 
     const response = await axios.get(
-  `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`
-);
+      `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`,
+      {
+        headers: {
+          Authorization:
+            `token ${process.env.GITHUB_TOKEN}`,
+        },
+      }
+    );
+
     cache.set(
       `repos-${username}`,
-
       response.data
     );
 
-    res.json(response.data);
+    res.json(
+      response.data
+    );
+
   } catch (error) {
-    if (error.response?.status === 404) {
+
+    if (
+      error.response?.status === 404
+    ) {
+
       return res.status(404).json({
-        message: "Repositories not found",
+        message:
+          "Repositories not found",
       });
+
     }
 
-    if (error.response?.status === 403) {
+    if (
+      error.response?.status === 403 ||
+      error.response?.status === 429
+    ) {
+
       return res.status(403).json({
-        message: "GitHub rate limit exceeded. Try again later.",
+        message:
+          "GitHub rate limit exceeded. Try again later.",
       });
+
     }
 
     res.status(500).json({
-      message: "Error fetching repositories",
+      message:
+        "Error fetching repositories",
     });
+
   }
 };
