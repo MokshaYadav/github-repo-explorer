@@ -85,7 +85,7 @@ github_repo_explorer
 Clone repository:
 
 ```bash
-git clone <your-github-repo-url>
+git clone https://github.com/MokshaYadav/github-repo-explorer
 cd github_repo_explorer
 ```
 
